@@ -51,7 +51,7 @@ if (isset($diseaseSpecializationMap[$disease])) {
 
     $priority = $_POST['priority'];
 
-    // ✅ Find doctor who matches specialization and is under max patient cap
+    
     $stmt = $conn->prepare("
         SELECT d.id
         FROM doctors d
@@ -77,19 +77,18 @@ if (isset($diseaseSpecializationMap[$disease])) {
         return;
     }
 
-    // ✅ Insert new patient with priority
+   
     $stmt = $conn->prepare("INSERT INTO patients (name, age, gender, disease, priority, assigned_doctor_id) VALUES (?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("sissii", $name, $age, $gender, $disease, $priority, $assigned_doctor_id);
 
     if ($stmt->execute()) {
         $patient_id = $conn->insert_id;
 
-        // ✅ Create FIFO-based appointment
         $stmt2 = $conn->prepare("INSERT INTO appointments (patient_id, doctor_id) VALUES (?, ?)");
         $stmt2->bind_param("ii", $patient_id, $assigned_doctor_id);
         $stmt2->execute();
 
-        // ✅ Get doctor info
+       
         $docStmt = $conn->prepare("SELECT name, specialization FROM doctors WHERE id = ?");
         $docStmt->bind_param("i", $assigned_doctor_id);
         $docStmt->execute();
