@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Smart Hospital Doctor Dashboard</title>
+  <style>
+    /* Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #dff6ff, #c5f3ff);
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+      min-height: 100vh;
+    }
+
+    header {
+      margin-bottom: 40px;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 40px;
+      background: linear-gradient(90deg, #00c6ff, #0072ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      color: transparent;
+    }
+
+    h2 {
+      font-size: 25px;
+      text-align: center;
+      color: #0077b6;
+      margin-bottom: 20px;
+    }
+
+    form {
+      background: white;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+      margin-bottom: 30px;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    input[type="number"],
+    input[type="submit"] {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    input[type="submit"] {
+      background: linear-gradient(to right, #00c6ff, #0072ff);
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    input[type="submit"]:hover {
+      background: linear-gradient(to right, #0072ff, #00c6ff);
+    }
+
+    #appointmentsList {
+      width: 100%;
+      max-width: 700px;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      background-color: #f0faff;
+      margin-bottom: 15px;
+      padding: 16px;
+      border-left: 5px solid #00b4d8;
+      border-radius: 12px;
+      line-height: 1.6;
+      font-size: 16px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 8px 16px;
+      background-color: #0072ff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #005bb5;
+    }
+
+    .logout-btn {
+      margin-top: 50px;
+      padding: 12px 24px;
+      background: linear-gradient(to right, #00c6ff, #0072ff);
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .logout-btn:hover {
+      background: linear-gradient(to right, #0072ff, #00c6ff);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>HealthOptima</h1>
+    <h2 class="subtitle">Doctor Dashboard</h2>
+  </header>
+
+  <h2>Your Appointments</h2>
+
+  <form onsubmit="loadAppointments(event)">
+    <label for="doctorId">Enter Your Doctor ID:</label>
+    <input type="number" id="doctorId" required>
+    <input type="submit" value="Load Appointments">
+  </form>
+
+  <div id="appointmentsList"></div>
+
+  <!-- Logout Button -->
+  <button class="logout-btn" onclick="logout()">Logout</button>
+
+  <script>
+    function loadAppointments(e) {
+      e.preventDefault();
+      const docId = document.getElementById("doctorId").value;
+
+      fetch(`/healthoptima/functions.php?action=get_appointments&doctor_id=${docId}`)
+        .then(res => res.json())
+        .then(data => {
+          let html = "<ul>";
+          if (data.length === 0) {
+            html += "<li>No appointments found.</li>";
+          } else {
+            data.forEach(item => {
+              html += `<li>
+                <b>${item.patient_name}</b> (${item.disease})<br>
+                Gender: ${item.gender}, Age: ${item.age}<br>
+                Status: ${item.status}, Created: ${item.created_at}`;
+
+              if (item.status === "pending") {
+                html += `<br><button onclick="markComplete(${item.appointment_id}, ${docId})">Mark Complete</button>`;
+              }
+
+              html += "</li>";
+            });
+          }
+          html += "</ul>";
+          document.getElementById("appointmentsList").innerHTML = html;
+        });
+    }
+
+    function markComplete(appointmentId, doctorId) {
+      fetch(`/healthoptima/functions.php?action=complete_appointment`, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `appointment_id=${appointmentId}`
+      })
+      .then(res => res.json())
+      .then(response => {
+        alert(response.message);
+        loadAppointments(new Event("submit")); // Refresh appointments list
+      });
+    }
+
+    function logout() {
+      fetch("/healthoptima/functions.php?action=logout")
+        .then(() => {
+          window.location.href = "login_form.html";
+        })
+        .catch(() => {
+          window.location.href = "login_form.html";
+        });
+    }
+  </script>
+
+</body>
+</html>

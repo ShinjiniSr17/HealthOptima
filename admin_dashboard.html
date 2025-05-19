@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Smart Hospital Admin Dashboard</title>
+  <style>
+    /* Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #dff6ff, #c5f3ff);
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+      min-height: 100vh;
+    }
+
+    header {
+      margin-bottom: 40px;
+      text-align: center;
+    }
+
+    .main-title,
+    .sub-title {
+      background: linear-gradient(90deg, #00c6ff, #0072ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 0;
+    }
+
+    .main-title {
+      font-size: 40px;
+      font-weight: bold;
+    }
+
+    .sub-title {
+      font-size: 24px;
+      font-weight: normal;
+      margin-top: 5px;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 30px;
+      width: 100%;
+      max-width: 1100px;
+    }
+
+    .card {
+      background: #ffffff;
+      padding: 25px;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+      transition: transform 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card h2 {
+      font-size: 22px;
+      color: #0077b6;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #e0f7ff;
+      padding-bottom: 10px;
+    }
+
+    ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    li {
+      background-color: #f0faff;
+      margin-bottom: 12px;
+      padding: 14px 18px;
+      border-left: 4px solid #00b4d8;
+      border-radius: 10px;
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    .status {
+      font-style: italic;
+      color: #444;
+      font-size: 14px;
+    }
+
+    .logout-btn {
+      margin-top: 50px;
+      padding: 12px 24px;
+      background: linear-gradient(to right, #00c6ff, #0072ff);
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .logout-btn:hover {
+      background: linear-gradient(to right, #0072ff, #00c6ff);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1 class="main-title">HealthOptima</h1>
+    <h2 class="sub-title">Admin Dashboard</h2>
+  </header>
+
+  <div class="container">
+    <!-- Users Section -->
+    <div class="card">
+      <h2>All Registered Users</h2>
+      <div id="userList">Loading users...</div>
+    </div>
+
+    <!-- Appointments Section -->
+    <div class="card">
+      <h2>All Appointments</h2>
+      <div id="appointmentList">Loading appointments...</div>
+    </div>
+  </div>
+
+  <!-- Logout Button at Bottom -->
+  <button class="logout-btn" onclick="logout()">Logout</button>
+
+  <script>
+    // Load users
+    fetch("/healthoptima/functions.php?action=get_all_users")
+      .then(res => res.json())
+      .then(data => {
+        let html = "<ul>";
+        if (data.length === 0) {
+          html += "<li>No users found.</li>";
+        } else {
+          data.forEach(user => {
+            html += <li><b>${user.username}</b> - Role: ${user.role}</li>;
+          });
+        }
+        html += "</ul>";
+        document.getElementById("userList").innerHTML = html;
+      });
+
+    // Load appointments
+    fetch("/healthoptima/functions.php?action=get_all_appointments")
+      .then(res => res.json())
+      .then(data => {
+        let html = "<ul>";
+        if (data.length === 0) {
+          html += "<li>No appointments found.</li>";
+        } else {
+          data.forEach(app => {
+            html += `<li>
+              Patient: <b>${app.patient_name}</b> (${app.disease})<br>
+              Doctor: <b>${app.doctor_name}</b><br>
+              <span class="status">Status: ${app.status} | Date: ${app.created_at}</span>
+            </li>`;
+          });
+        }
+        html += "</ul>";
+        document.getElementById("appointmentList").innerHTML = html;
+      });
+
+    // Logout and redirect to login_form.html
+    function logout() {
+      fetch("/healthoptima/functions.php?action=logout")
+        .then(() => {
+          window.location.href = "login_form.html";
+        })
+        .catch(() => {
+          window.location.href = "login_form.html";
+        });
+    }
+  </script>
+
+</body>
+</html>

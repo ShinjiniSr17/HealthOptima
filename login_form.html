@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HealthOptima Login</title>
+  <style>
+    /* Reset & Base Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #dff6ff, #c5f3ff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      color: #333;
+    }
+
+    .login-container {
+      background-color: white;
+      padding: 40px 30px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .title {
+      font-size: 28px;
+      background: linear-gradient(90deg, #00c6ff, #0072ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 5px;
+    }
+
+    .subtitle {
+      font-size: 20px;
+      background: linear-gradient(90deg, #00c6ff, #0072ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 30px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+      color: #2f5061;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 15px;
+      transition: border-color 0.3s ease;
+    }
+
+    input[type="text"]:focus,
+    input[type="password"]:focus {
+      border-color: #0072ff;
+      outline: none;
+    }
+
+    input[type="submit"] {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(to right, #00c6ff, #0072ff);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    input[type="submit"]:hover {
+      background: linear-gradient(to right, #0072ff, #00c6ff);
+    }
+
+    .error-message {
+      color: red;
+      margin-top: 10px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    @media (max-width: 500px) {
+      .login-container {
+        padding: 30px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="title">HealthOptima</div>
+    <div class="subtitle">Login</div>
+    <form onsubmit="login(event)">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" name="username" id="username" required>
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" name="password" id="password" required>
+      </div>
+      <input type="submit" value="Login">
+    </form>
+    <div id="error" class="error-message"></div>
+  </div>
+
+  <script>
+    function login(e) {
+      e.preventDefault();
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+
+      fetch("/healthoptima/functions.php?action=login", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
+      })
+      .then(res => res.json())
+      .then(response => {
+        if (response.success) {
+          switch (response.role) {
+            case "admin":
+              window.location.href = "/healthoptima/views/admin_dashboard.html";
+              break;
+            case "doctor":
+              window.location.href = "/healthoptima/views/doctor_dashboard.html";
+              break;
+            case "receptionist":
+              window.location.href = "/healthoptima/views/receptionist_dashboard.html";
+              break;
+            case "patient":
+              window.location.href = "/healthoptima/views/patient_dashboard.html";
+              break;
+            default:
+              alert("Unknown role. Redirect failed.");
+          }
+        } else {
+          document.getElementById("error").textContent = response.message;
+        }
+      })
+      .catch(error => {
+        document.getElementById("error").textContent = "An error occurred. Please try again.";
+      });
+    }
+  </script>
+</body>
+</html>

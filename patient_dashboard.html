@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Patient Dashboard</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #dff6fd, #e6f9ff);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      padding: 20px;
+    }
+
+    .dashboard-box {
+      background-color: white;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      max-width: 500px;
+      width: 100%;
+    }
+
+    .dashboard-box h1 {
+      font-size: 26px;
+      color: #0288d1;
+      margin-bottom: 20px;
+    }
+
+    .dashboard-box p {
+      font-size: 16px;
+      color: #555;
+    }
+
+    .dashboard-box a button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #0288d1;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .dashboard-box a button:hover {
+      background-color: #026aa7;
+    }
+
+    @media (max-width: 500px) {
+      .dashboard-box {
+        padding: 30px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-box">
+    <h1>Welcome Patient</h1>
+    <p>You’ll be able to view your profile and appointments here.</p>
+    <br>
+    <a href="book_appointment.html"><button>Book Appointment</button></a>
+  </div>
+</body>
+</html>

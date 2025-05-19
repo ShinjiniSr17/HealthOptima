@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Receptionist Dashboard - HealthOptima</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #c2e9fb, #e0f7fa);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 30px 20px;
+    }
+
+    h1 {
+      font-size: 32px;
+      color: #0077cc;
+      margin-bottom: 30px;
+      font-weight: bold;
+    }
+
+    .card {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      padding: 25px 30px;
+      width: 100%;
+      max-width: 900px;
+      margin-bottom: 30px;
+    }
+
+    h2 {
+      color: #0077cc;
+      margin-bottom: 20px;
+      font-size: 22px;
+      font-weight: 600;
+    }
+
+    form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px 20px;
+    }
+
+    form input,
+    form select {
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      width: 100%;
+    }
+
+    form button {
+      grid-column: span 2;
+      padding: 12px;
+      background-color: #0077cc;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    form button:hover {
+      background-color: #005fa3;
+    }
+
+    #messageBox p {
+      margin-top: 15px;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      font-size: 15px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #f4f7fa;
+      color: #0077cc;
+    }
+
+    .logout-btn {
+      margin-top: 20px;
+      padding: 12px 30px;
+      background-color: #0077cc;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .logout-btn:hover {
+      background-color: #005fa3;
+    }
+
+    @media (max-width: 768px) {
+      form {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Receptionist Dashboard</h1>
+
+  <div class="card">
+    <h2>Register New Patient</h2>
+    <form id="patientForm">
+      <input type="text" name="name" placeholder="Name" required>
+      <input type="number" name="age" placeholder="Age" required>
+      <select name="gender" required>
+        <option value="">Select Gender</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Other">Other</option>
+      </select>
+      <input type="text" name="disease" placeholder="Disease / Specialization" required>
+      <select name="priority" required>
+        <option value="">Priority</option>
+        <option value="1">1 - Critical</option>
+        <option value="2">2 - High</option>
+        <option value="3">3 - Medium</option>
+        <option value="4">4 - Low</option>
+        <option value="5" selected>5 - Routine</option>
+      </select>
+      <button type="submit">Register Patient</button>
+    </form>
+    <div id="messageBox"></div>
+  </div>
+
+  <div class="card">
+    <h2>All Registered Patients</h2>
+    <div id="patientList">Loading...</div>
+  </div>
+
+  <!-- Logout Button -->
+  <button class="logout-btn" onclick="window.location.href='login_form.html'">Logout</button>
+
+  <script>
+    document.getElementById("patientForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const form = e.target;
+      const formData = new FormData(form);
+
+      fetch("/healthoptima/functions.php?action=register_patient", {
+        method: "POST",
+        body: new URLSearchParams(formData)
+      })
+      .then(res => res.json())
+      .then(data => {
+        const msg = document.getElementById("messageBox");
+        if (data.success) {
+          msg.innerHTML = `<p style="color: green;">${data.message}</p>`;
+          form.reset();
+          loadPatients();
+        } else {
+          msg.innerHTML = `<p style="color: red;">${data.message}</p>`;
+        }
+      })
+      .catch(err => {
+        console.error("Error:", err);
+        document.getElementById("messageBox").innerHTML =
+          `<p style="color: red;">Something went wrong. Check the server.</p>`;
+      });
+    });
+
+    function loadPatients() {
+      fetch("/healthoptima/functions.php?action=get_all_patients")
+        .then(res => res.json())
+        .then(data => {
+          let html = "<table><tr><th>Name</th><th>Age</th><th>Gender</th><th>Disease</th><th>Doctor ID</th><th>Doctor Name</th></tr>";
+          data.forEach(p => {
+            html += `<tr>
+              <td>${p.patient_name}</td>
+              <td>${p.age}</td>
+              <td>${p.gender}</td>
+              <td>${p.disease}</td>
+              <td>${p.doctor_id || '-'}</td>
+              <td>${p.doctor_name || 'Not Assigned'}</td>
+            </tr>`;
+          });
+          html += "</table>";
+          document.getElementById("patientList").innerHTML = html;
+        });
+    }
+
+    // Load patients on page load
+    loadPatients();
+  </script>
+
+</body>
+</html>
