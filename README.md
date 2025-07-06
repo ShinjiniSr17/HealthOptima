@@ -1,4 +1,4 @@
-HealthOptima Frontend Integration Guide
+HealthOptima
 -----------------------------------------
 
 HealthOptima is a secure, role-based Smart Hospital Management System built using PHP (backend) and HTML, CSS, JavaScript (frontend). It enables streamlined hospital operations such as patient registration, appointment scheduling, user login with roles (admin, doctor, receptionist), and secure session management — all in one lightweight web-based platform.
