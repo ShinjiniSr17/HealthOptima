@@ -41,9 +41,9 @@ Login with one of these sample users:
 
 | Username  | Password   | Role         |
 |-----------|------------|--------------|
-| admin1    | admin123   | admin        |
-| doc1      | doc123     | doctor       |
-| recept1   | recept123  | receptionist |
+| admin21   | Admin@21   | admin        |
+| doc1      | Doctor@1   | doctor       |
+| Recep21   | Recep@21   | receptionist |
 
 
  Your Job (Frontend Work):
